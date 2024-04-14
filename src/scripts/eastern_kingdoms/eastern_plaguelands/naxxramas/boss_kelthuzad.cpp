@@ -59,7 +59,9 @@ enum KelthuzadData
     SPELL_FROST_BLAST                   = 27808,
     SPELL_BERSERK                       = 28498,
 
-    SPELL_DISPELL_SHACKLES              = 28471             // not used, doing it "manually"
+    SPELL_DISPELL_SHACKLES              = 28471,             // not used, doing it "manually"
+
+    P2_PRACTICE			= 1
 };
 
 enum AddSpells
@@ -442,18 +444,26 @@ struct boss_kelthuzadAI : public ScriptedAI
         DoScriptText(SAY_SUMMON_MINIONS, m_creature);
         DoCastAOE(SPELL_VISUAL_CHANNEL);
 
-        events.ScheduleEvent(EVENT_DESPAWN_PORTAL,  Seconds(7));
-        events.ScheduleEvent(EVENT_PUT_IN_COMBAT,   Seconds(20));
-        events.ScheduleEvent(EVENT_PHASE_TWO_INTRO, Minutes(5) + Seconds(20));
+        if(P2_PRACTICE) {
+            events.ScheduleEvent(EVENT_DESPAWN_PORTAL,  Seconds(1));
+            events.ScheduleEvent(EVENT_PUT_IN_COMBAT,   Seconds(2));
+            events.ScheduleEvent(EVENT_PHASE_TWO_INTRO, Seconds(5));
 
-        p1Timer = 320000;
-        events.ScheduleEvent(EVENT_SKELETON, Seconds(20));
-        //events.ScheduleEvent(EVENT_SOUL_WEAVER, Seconds(35));
-        //events.ScheduleEvent(EVENT_ABOMINATION, Seconds(43));
-        for (uint32 i : abominationSpawnMs)
-            events.ScheduleEvent(EVENT_ABOMINATION, i);
-        for (uint32 i : soulweaverSpawnMs)
-            events.ScheduleEvent(EVENT_SOUL_WEAVER, i);
+            p1Timer = 7000;
+        } else {
+            events.ScheduleEvent(EVENT_DESPAWN_PORTAL,  Seconds(7));
+            events.ScheduleEvent(EVENT_PUT_IN_COMBAT,   Seconds(20));
+            events.ScheduleEvent(EVENT_PHASE_TWO_INTRO, Minutes(5) + Seconds(20));
+
+            p1Timer = 320000;
+            events.ScheduleEvent(EVENT_SKELETON, Seconds(20));
+            //events.ScheduleEvent(EVENT_SOUL_WEAVER, Seconds(35));
+            //events.ScheduleEvent(EVENT_ABOMINATION, Seconds(43));
+            for (uint32 i : abominationSpawnMs)
+                events.ScheduleEvent(EVENT_ABOMINATION, i);
+            for (uint32 i : soulweaverSpawnMs)
+                events.ScheduleEvent(EVENT_SOUL_WEAVER, i);
+        }
 
         m_pInstance->DoUseDoorOrButton(pullPortalGuid);
 

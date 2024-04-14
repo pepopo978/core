@@ -60,7 +60,8 @@ enum HeiganData
     SPELL_TELEPORT_SELF     = 30211,
     SPELL_MANABURN          = 29310,
 
-    NPC_PLAGUE_WAVE         = 17293
+    NPC_PLAGUE_WAVE         = 17293,
+	DANCE_PRACTICE			= 1
 };
 
 enum Events
@@ -145,13 +146,20 @@ struct boss_heiganAI : public ScriptedAI
 
         eruptionPhase = 0;
         currentPhase = PHASE_FIGHT;
-        m_events.ScheduleEvent(EVENT_FEVER,      Seconds(30), 0, PHASE_FIGHT);
-        m_events.ScheduleEvent(EVENT_DANCE,      Seconds(90), 0, PHASE_FIGHT);
-        m_events.ScheduleEvent(EVENT_ERUPT,      Seconds(15), 0, PHASE_FIGHT);
-        m_events.ScheduleEvent(EVENT_MANABURN,   Seconds(15), 0, PHASE_FIGHT);
-        m_events.ScheduleEvent(EVENT_TAUNT,      randtime(Seconds(20), Seconds(70)));
-        m_events.ScheduleEvent(EVENT_DOOR_CLOSE, Seconds(15));
-        m_events.ScheduleEvent(EVENT_PORT_PLAYER,Seconds(40));
+
+		if (DANCE_PRACTICE == 1) {
+			m_events.ScheduleEvent(EVENT_DOOR_CLOSE, Seconds(3));
+			m_events.ScheduleEvent(EVENT_DANCE, Seconds(5), 0, PHASE_FIGHT);
+		}
+		else {
+			m_events.ScheduleEvent(EVENT_FEVER, Seconds(30), 0, PHASE_FIGHT);
+			m_events.ScheduleEvent(EVENT_DANCE, Seconds(90), 0, PHASE_FIGHT);
+			m_events.ScheduleEvent(EVENT_ERUPT, Seconds(15), 0, PHASE_FIGHT);
+			m_events.ScheduleEvent(EVENT_MANABURN, Seconds(15), 0, PHASE_FIGHT);
+			m_events.ScheduleEvent(EVENT_TAUNT, randtime(Seconds(20), Seconds(70)));
+			m_events.ScheduleEvent(EVENT_DOOR_CLOSE, Seconds(15));
+			//m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(40));
+		}
 
         DoScriptText(urand(SAY_AGGRO1, SAY_AGGRO3), m_creature);
 
@@ -328,13 +336,21 @@ struct boss_heiganAI : public ScriptedAI
 
         uint32 tauntStash = m_events.GetTimeUntilEvent(EVENT_TAUNT);
         m_events.Reset();
-        m_events.ScheduleEvent(EVENT_TAUNT,     tauntStash);
-        m_events.ScheduleEvent(EVENT_FEVER,     Seconds(5)); // videos confirm this, unless raid moves perfectly, more or less everyone is hit.
-        m_events.ScheduleEvent(EVENT_DANCE,     Seconds(90));
-        m_events.ScheduleEvent(EVENT_ERUPT,     Seconds(10));
-        m_events.ScheduleEvent(EVENT_MANABURN,  Seconds(10));
-        m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(18));
-        m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(48));
+
+		if (DANCE_PRACTICE == 1) {
+			m_events.ScheduleEvent(EVENT_TAUNT, tauntStash);
+			m_events.ScheduleEvent(EVENT_DANCE, Seconds(5));
+		}
+		else {
+			m_events.ScheduleEvent(EVENT_TAUNT, tauntStash);
+			m_events.ScheduleEvent(EVENT_FEVER, Seconds(5)); // videos confirm this, unless raid moves perfectly, more or less everyone is hit.
+			m_events.ScheduleEvent(EVENT_DANCE, Seconds(90));
+			m_events.ScheduleEvent(EVENT_ERUPT, Seconds(10));
+			m_events.ScheduleEvent(EVENT_MANABURN, Seconds(10));
+			//m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(18));
+			//m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(48));
+		}
+
         m_creature->InterruptNonMeleeSpells(false);
         m_creature->SetReactState(REACT_AGGRESSIVE);
         eruptionPhase = 0;

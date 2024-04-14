@@ -98,15 +98,6 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
     if (HasLowerSecurityAccount(nullptr, targetAccountId, true))
         return false;
 
-    // account can't set security to same or grater level, need more power GM or console
-    AccountTypes plSecurity = GetAccessLevel();
-    if (AccountTypes(gm) >= plSecurity)
-    {
-        SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     if (targetPlayer)
     {
         ChatHandler(targetPlayer).PSendSysMessage(LANG_YOURS_SECURITY_CHANGED, GetNameLink().c_str(), gm);

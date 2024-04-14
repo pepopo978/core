@@ -790,7 +790,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
                     {
                         if (DoCastSpellIfCan(pTar, SPELL_HOLY_WRATH) == CAST_OK)
                         {
-                            m_events.Repeat(Seconds(urand(10, 14)));
+                            m_events.Repeat(Seconds(urand(1, 1)));
                             DoScriptText(SAY_ZELI_SPECIAL, m_creature);
                             break;
                         }

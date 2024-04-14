@@ -1474,6 +1474,8 @@ AccountTypes ChatHandler::GetAccessLevel() const
 
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
+	return true;
+
     // check security level only for simple  command (without child commands)
     if (GetAccessLevel() >= (AccountTypes)cmd.SecurityLevel)
     {
@@ -1507,6 +1509,7 @@ std::string ChatHandler::GetNameLink() const
 
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 {
+	return false; // allow everything
     WorldSession* target_session = nullptr;
     uint32 target_account = 0;
 
@@ -1527,6 +1530,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 
 bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_account, bool strong)
 {
+	return false; // allow everything
     AccountTypes target_sec;
 
     // ignore only for non-players for non strong checks (when allow apply command at least to same sec level)

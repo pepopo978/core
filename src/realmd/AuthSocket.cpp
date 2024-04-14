@@ -527,7 +527,11 @@ bool AuthSocket::_HandleLogonChallenge()
                         m_localizationName[i] = ch->country[4-i-1];
 
                     LoadAccountSecurityLevels(account_id);
-                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", m_login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(m_localizationName));
+					
+					time_t ltime;
+					time(&ltime);
+
+                    sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] %s Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", ctime(&ltime), m_login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(m_localizationName));
 
                     m_accountId = account_id;
 
@@ -691,14 +695,6 @@ bool AuthSocket::_HandleLogonProof()
     // Check if SRP6 results match (password is correct), else send an error
     if (!srp.Proof(lp.M1, 20) && pinResult)
     {
-        if (!VerifyVersion(lp.A, sizeof(lp.A), lp.crc_hash, false))
-        {
-            sLog.Out(LOG_BASIC, LOG_LVL_BASIC, "[AuthChallenge] Account %s tried to login with modified client!", m_login.c_str());
-            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_INVALID };
-            send(data, sizeof(data));
-            return true;
-        }
-
         // Geolocking checks must be done after an otherwise successful login to prevent lockout attacks
         if (m_geoUnlockPIN) // remove the PIN to unlock the account since login succeeded
         {

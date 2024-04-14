@@ -308,7 +308,7 @@ SpellProcEventTriggerCheck Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, Spel
         {
             if (!procSpell && (procFlag & (PROC_FLAG_DEAL_MELEE_SWING | PROC_FLAG_DEAL_MELEE_ABILITY)))
             {
-                if (roll_chance_u(10))
+                if (roll_chance_u(100))
                     return SPELL_PROC_TRIGGER_OK;
                 else
                     return SPELL_PROC_TRIGGER_ROLL_FAILED;
@@ -879,7 +879,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 amount, uint
                         bool notAtMaxStack = igniteAura->GetStackAmount() < 5;
                         
                         bool reapplyIgnite = igniteAura->GetAuraTicks() >= igniteAura->GetAuraMaxTicks();
-                        
                         if (!reapplyIgnite)
                         {
                             if (notAtMaxStack)

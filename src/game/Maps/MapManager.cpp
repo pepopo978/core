@@ -592,7 +592,7 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
         MANGOS_ASSERT(false);
     }
 
-    sLog.Out(LOG_BASIC, LOG_LVL_DEBUG, "MapInstanced::CreateInstanceMap: %s map instance %d for %d created", save ? "" : "new ", InstanceId, id);
+    sLog.Out(LOG_BASIC, LOG_LVL_MINIMAL, "MapInstanced::CreateInstanceMap: %s map instance %d for %d created", save ? "" : "new ", InstanceId, id);
 
     DungeonMap *map = new DungeonMap(id, i_gridCleanUpDelay, InstanceId);
 

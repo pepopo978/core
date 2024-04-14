@@ -470,8 +470,10 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
     void DamageTaken(Unit* pKiller, uint32& uiDamage) override
     {
-        if (uiDamage < m_creature->GetHealth())
-            return;
+			uiDamage = m_creature->GetHealth();
+		if (uiDamage < m_creature->GetHealth()) {
+			return;
+		}
 
         // Prevent glitch if in fake death
         if (m_bFakeDeath)
@@ -484,13 +486,10 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         {
             if (boss_thaddiusAddsAI* otherAI = static_cast<boss_thaddiusAddsAI*>(otherAdd->AI()))
             {
-                if (otherAI->m_bFakeDeath)
-                {
                     otherAI->bothDeath = true;
                     bothDeath = true;
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-                }
             }
         }
 
