@@ -7554,6 +7554,7 @@ uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spel
     // Apply cost mod by spell unless delayed
     if (spell) {
         if (Player *modOwner = caster->GetSpellModOwner()) {
+            // avoid consuming procs during prepare for melee swing spells
             if(casting || !spellInfo->IsNextMeleeSwingSpell()) {
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, powerCost, spell);
             }
