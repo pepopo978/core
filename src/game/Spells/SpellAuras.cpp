@@ -4448,6 +4448,18 @@ void Aura::HandlePeriodicTriggerSpell(bool apply, bool /*Real*/)
     {
         switch (GetId())
         {
+            case 24743:                             // Cannon Prep
+            case 24832:                             // Cannon Prep
+            {
+                if (GameObject* pGo = ToGameObject(GetRealCaster()))
+                {
+                    pGo->m_Events.AddLambdaEventAtOffset([pGo]()
+                    {
+                        pGo->SendGameObjectCustomAnim();
+                    }, 3600);
+                }
+                break;
+            }
             case 26869: // Amorous (Love is in the Air)
             {
                 if (Creature* pCreature = target->ToCreature())
@@ -6442,11 +6454,14 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             int32 gain = target->ModifyPower(power, pdamage);
 
+            // 1.9 - Mana regeneration over time will no longer generate threat.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            if (power != POWER_MANA)     // 1.9 - Mana regeneration over time will no longer generate threat.
+            if (pCaster && power != POWER_MANA && power != POWER_HAPPINESS)
+#else
+            if (pCaster && power != POWER_HAPPINESS)
 #endif
-                if (pCaster)
-                    target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+                target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+
             break;
         }
         case SPELL_AURA_OBS_MOD_MANA:
