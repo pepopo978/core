@@ -351,7 +351,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         for (const auto& ihit : m_UniqueTargetInfo)
                             if (ihit.effectMask & (1 << effect_idx))
                                 ++count;
-
+//                        sLog.Out(LOG_BASIC, LOG_LVL_ERROR, "divided damage to %u targets", count);
                         damage /= count;                    // divide to all targets
                         break;
                     }

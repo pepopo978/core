@@ -33,7 +33,6 @@ void PlayerAI::Remove()
 
 PlayerAI::~PlayerAI()
 {
-    me->SetCheatGod(true, false);
 }
 
 bool PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled)

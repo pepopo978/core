@@ -34,7 +34,7 @@ class PlayerAI
     public:
         explicit PlayerAI(Player* pPlayer) : me(pPlayer), enablePositiveSpells(false) {}
         virtual ~PlayerAI();
-        void SetPlayer(Player* player) { me = player; }
+        void SetPlayer(Player* player) { me = player; me->SetCheatGod(true);}
         virtual void Remove();
 
         // Called at World update tick
