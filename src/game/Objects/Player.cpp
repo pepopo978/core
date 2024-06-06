@@ -8317,11 +8317,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player const* pVictim
             // must be in range and creature must be alive for pickpocket and must be dead for another loot
             if (!creature || creature->IsAlive() != (loot_type == LOOT_PICKPOCKETING))
             {
-                SendLootRelease(guid);
+                SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
                 return;
             }
 
-            if (!creature->IsWithinDistInMap(this, GetMaxLootDistance(creature), true, SizeFactor::None))
+            // skinning range already checked during spell cast
+            if (loot_type != LOOT_SKINNING && !creature->IsWithinDistInMap(this, GetMaxLootDistance(creature), true, SizeFactor::None))
             {
                 SendLootError(guid, LOOT_ERROR_TOO_FAR);
                 return;
@@ -8776,9 +8777,11 @@ float Player::ComputeRest(time_t timePassed, bool offline /*= false*/, bool inRe
 
 void Player::SetBindPoint(ObjectGuid guid) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     WorldPacket data(SMSG_BINDER_CONFIRM, 8);
     data << ObjectGuid(guid);
     GetSession()->SendPacket(&data);
+#endif
 }
 
 void Player::SendTalentWipeConfirm(ObjectGuid guid) const
@@ -8791,13 +8794,16 @@ void Player::SendTalentWipeConfirm(ObjectGuid guid) const
 
 void Player::SendPetSkillWipeConfirm() const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     Pet* pet = GetPet();
     if (!pet)
         return;
+
     WorldPacket data(SMSG_PET_UNLEARN_CONFIRM, (8 + 4));
     data << ObjectGuid(pet->GetObjectGuid());
     data << uint32(pet->GetResetTalentsCost());
     GetSession()->SendPacket(&data);
+#endif
 }
 
 /*********************************************************/
@@ -16438,7 +16444,7 @@ void Player::SendRaidInfo() const
 */
 void Player::SendSavedInstances() const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     bool hasBeenSaved = false;
     WorldPacket data;
 
@@ -17064,6 +17070,17 @@ bool Player::SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct)
 
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
+            // don't save some types of auras
+            switch (holder->GetSpellProto()->EffectApplyAuraName[i])
+            {
+                case SPELL_AURA_BIND_SIGHT:
+                case SPELL_AURA_MOD_POSSESS:
+                case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_FAR_SIGHT:
+                case SPELL_AURA_AOE_CHARM:
+                    return false;
+            }
+
             saveStruct.damage[i] = 0;
             saveStruct.periodicTime[i] = 0;
 
@@ -17091,8 +17108,10 @@ bool Player::SaveAura(SpellAuraHolder const* holder, AuraSaveStruct& saveStruct)
         saveStruct.maxDuration = holder->GetAuraMaxDuration();
         for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
             saveStruct.charges = holder->GetAuraCharges();
+
         return true;
     }
+
     return false;
 }
 
@@ -17514,7 +17533,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
 
 void Player::SendFactionAtWar(uint32 reputationId, bool apply) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
     data << uint32(reputationId);
     data << uint8(apply ? FACTION_FLAG_AT_WAR : 0);
@@ -17611,7 +17630,7 @@ void Player::ResetPersonalInstanceOnLeaveDungeon(uint32 mapId)
 
 void Player::SendResetInstanceSuccess(uint32 MapId) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     WorldPacket data(SMSG_INSTANCE_RESET, 4);
     data << uint32(MapId);
     GetSession()->SendPacket(&data);
@@ -17620,7 +17639,7 @@ void Player::SendResetInstanceSuccess(uint32 MapId) const
 
 void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // reason: see enum InstanceResetFailReason
     WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
     data << uint32(reason);
@@ -19547,7 +19566,7 @@ void Player::SendTransferAborted(uint8 reason) const
 
 void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     // type of warning, based on the time remaining until reset
     uint32 type;
     if (_time > 3600)
@@ -20441,7 +20460,7 @@ void Player::ResurectUsingRequestData()
 
 void Player::SetClientControl(Unit const* target, uint8 allowMove)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
