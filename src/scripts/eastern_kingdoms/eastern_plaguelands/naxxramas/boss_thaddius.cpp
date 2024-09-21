@@ -470,10 +470,8 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
     void DamageTaken(Unit* pKiller, uint32& uiDamage) override
     {
-			uiDamage = m_creature->GetHealth();
-		if (uiDamage < m_creature->GetHealth()) {
+        if (uiDamage < m_creature->GetHealth())
 			return;
-		}
 
         // Prevent glitch if in fake death
         if (m_bFakeDeath)
